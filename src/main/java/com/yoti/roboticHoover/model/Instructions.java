@@ -10,7 +10,7 @@ public class Instructions {
     private List<Integer> roomSize;
 
     @NotNull
-    private List<Integer> initialCoords;
+    private List<Integer> coords;
 
     @NotNull
     private List<List<Integer>> patches;
@@ -20,9 +20,9 @@ public class Instructions {
 
     public Instructions() {}
 
-    public Instructions(List<Integer> roomSize, List<Integer> initialCoords, List<List<Integer>> patches, String instructions) {
+    public Instructions(List<Integer> roomSize, List<Integer> coords, List<List<Integer>> patches, String instructions) {
         this.roomSize = Objects.requireNonNull(roomSize);
-        this.initialCoords = Objects.requireNonNull(initialCoords);
+        this.coords = Objects.requireNonNull(coords);
         this.patches = Objects.requireNonNull(patches);
         this.instructions = Objects.requireNonNull(instructions);
     }
@@ -31,8 +31,8 @@ public class Instructions {
         return roomSize;
     }
 
-    public List<Integer> getInitialCoords() {
-        return initialCoords;
+    public List<Integer> getCoords() {
+        return coords;
     }
 
     public List<List<Integer>> getPatches() {

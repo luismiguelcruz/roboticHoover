@@ -1,7 +1,9 @@
 package com.yoti.roboticHoover.service;
 
+import com.google.common.collect.ImmutableList;
 import com.yoti.roboticHoover.model.InstructionsWrapper;
 import com.yoti.roboticHoover.model.Position;
+import com.yoti.roboticHoover.model.RoboticHooverResponse;
 import com.yoti.roboticHoover.util.Movement;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class RoboticHooverServiceImpl implements RoboticHooverService {
     }
 
     @Override
-    public Position moveRoboticHoover(final InstructionsWrapper instructions) {
+    public RoboticHooverResponse moveRoboticHoover(final InstructionsWrapper instructions) {
         this.instructions = instructions;
         this.currentPosition = instructions.getInitialPosition();
         this.patches = new ArrayList<>();
@@ -31,7 +33,7 @@ public class RoboticHooverServiceImpl implements RoboticHooverService {
             currentPosition = new Position(-1, -1);
         }
 
-        return currentPosition;
+        return new RoboticHooverResponse(ImmutableList.of(currentPosition.getX(), currentPosition.getY()), cleanPatches);
     }
 
     private void applyMovements() {
@@ -56,8 +58,8 @@ public class RoboticHooverServiceImpl implements RoboticHooverService {
 
     // checks if the evaluated position is correct
     public boolean checkValidPosition(final Position position) {
-        if (position.getX() < 0 || position.getX() > instructions.getMaxX() ||
-                position.getY() < 0 || position.getY() > instructions.getMaxY()) {
+        if (position.getX() < 1 || position.getX() > instructions.getMaxX() ||
+                position.getY() < 1 || position.getY() > instructions.getMaxY()) {
             return false;
         }
 
