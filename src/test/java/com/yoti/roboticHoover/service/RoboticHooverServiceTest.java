@@ -90,49 +90,4 @@ public class RoboticHooverServiceTest {
 
         assertThat(response.getPatches()).isEqualTo(1);
     }
-
-    /*@Test
-    public void test() {
-        final List<String> errors = new ArrayList();
-
-        final String instructions = "NSEW";
-
-        if (!StringUtils.isBlank(instructions)) {
-            final List<Movement> allowedMovements = Arrays.asList(Movement.values());
-            Arrays.asList(instructions.split("")).stream()
-                    .forEach(currentInstruction -> {
-                        // Check if the
-                        final Optional<Movement> movementOpt = allowedMovements.stream()
-                                .filter(allowedInstruction ->
-                                    StringUtils.equals(allowedInstruction.getName(), currentInstruction))
-                                .findAny();
-
-                        if (!movementOpt.isPresent()) {
-                            errors.add("ERROR: Incorrect movement instruction \""+currentInstruction+"\"");
-                        }
-                    });
-        }
-
-        final List<Movement> movements = new ArrayList<>();
-        Arrays.asList(instructions.split("")).stream()
-                .forEach(currentInstruction -> {
-                         Movement m = null;
-                        switch(currentInstruction) {
-                            case "N":
-                                movements.add(NORTH);
-                                break;
-                            case "S":
-                                movements.add(SOUTH);
-                                break;
-                            case "E":
-                                movements.add(EAST);
-                                break;
-                            case "W":
-                                movements.add(WEST);
-                                break;
-                        }
-                });
-
-        assertThat(errors).hasSize(1);
-    }*/
 }
