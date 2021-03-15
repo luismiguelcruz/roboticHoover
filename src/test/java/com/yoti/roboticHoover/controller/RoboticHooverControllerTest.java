@@ -1,9 +1,12 @@
 package com.yoti.roboticHoover.controller;
 
 import com.yoti.roboticHoover.model.InstructionsWrapper;
+import com.yoti.roboticHoover.model.Position;
 import com.yoti.roboticHoover.model.RoboticHooverResponse;
 import com.yoti.roboticHoover.service.RoboticHooverService;
+import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
@@ -39,29 +43,7 @@ public class RoboticHooverControllerTest {
     @MockBean
     private RoboticHooverService roboticHooverService;
 
-    private InstructionsWrapper instructionWrapper;
-
     private String expectedMessage;
-
-    private final String validRequest = "{\n" +
-            "  \"roomSize\" : [5, 5],\n" +
-            "  \"coords\" : [1, 2],\n" +
-            "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
-            "  \"instructions\" : \"NNESEESWNWW\"\n" +
-            "}";
-
-    private final String invalidParameterRequest = "{\n" +
-            "  \"roomSize\" : [5],\n" +
-            "  \"coords\" : [1, 2],\n" +
-            "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
-            "  \"navigationInstructions\" : \"NNESEESWNWW\"\n" +
-            "}";
-
-    private final String missingParametherRequest = "{\n" +
-            "  \"roomSize\" : [5, 5],\n" +
-            "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
-            "  \"instructions\" : \"NNESEESWNWW\"\n" +
-            "}";
 
     private String validResponse = "{\"coords\":[1,3],\"patches\":1}";
 
@@ -71,54 +53,77 @@ public class RoboticHooverControllerTest {
 
     @Test
     public void whenValidRequestIsSentThenReturnACorrectFinalPosition() throws Exception {
+        final String validRequest = "{\n" +
+                "  \"roomSize\" : [5, 5],\n" +
+                "  \"coords\" : [1, 2],\n" +
+                "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
+                "  \"instructions\" : \"NNESEESWNWW\"\n" +
+                "}";
 
         doReturn(buildResponse(Arrays.asList(1, 3), 1)).when(roboticHooverService).moveRoboticHoover(any());
 
-        final RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/hoover")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(validRequest);
+        final MvcResult result = getMvcResult(validRequest, status().isOk());
 
-        final MvcResult result = mockMvc.perform(requestBuilder).andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(validResponse).isEqualTo(result.getResponse().getContentAsString());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(validResponse);
     }
 
     @Test
-    public void whenInvalidArgumentInRequestIsSentThenReturnAStringContainingErrorMessage() throws Exception{
+    public void whenInvalidCoordinateSizeInRequestIsSentThenReturnAStringContainingErrorMessage() throws Exception{
+        final String invalidRequest = "{\n" +
+                "  \"roomSize\" : [5],\n" +
+                "  \"coords\" : [1, 2],\n" +
+                "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
+                "  \"navigationInstructions\" : \"NNESEESWNWW\"\n" +
+                "}";
         expectedMessage = "ERROR: Incorrect room size";
 
-        final RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/hoover")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidParameterRequest);
+        final MvcResult result = getMvcResult(invalidRequest, status().isBadRequest());
 
-        final MvcResult result = mockMvc.perform(requestBuilder).andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
+        assertThat(result.getResponse().getContentAsString()).contains(expectedMessage);
+    }
+
+    @Test
+    public void whenInvalidMovementInRequestIsSentThenReturnAStringContainingErrorMessage() throws Exception{
+        final String invalidRequest = "{\n" +
+                "  \"roomSize\" : [5, 5],\n" +
+                "  \"coords\" : [1, 2],\n" +
+                "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
+                "  \"instructions\" : \"NZNESEESWNWW\"\n" +
+                "}";
+        expectedMessage = "ERROR: Incorrect movement instruction \\\"Z\\\"";
+
+        final MvcResult result = getMvcResult(invalidRequest, status().isBadRequest());
 
         assertThat(result.getResponse().getContentAsString()).contains(expectedMessage);
     }
 
     @Test
     public void whenMissingParameterRequestIsSentThenReturnAStringContainingErrorMessage() throws Exception{
+        final String missingParametherRequest = "{\n" +
+                "  \"roomSize\" : [5, 5],\n" +
+                "  \"patches\" : [[1, 0], [2, 2], [2, 3]],\n" +
+                "  \"instructions\" : \"NNESEESWNWW\"\n" +
+                "}";
         expectedMessage = "ERROR: Incorrect initial coordinates";
 
-        final RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/hoover")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(missingParametherRequest);
-
-        final MvcResult result = mockMvc.perform(requestBuilder).andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
+        final MvcResult result = getMvcResult(missingParametherRequest, status().isBadRequest());
 
         assertThat(result.getResponse().getContentAsString()).containsSequence(expectedMessage);
     }
 
     private RoboticHooverResponse buildResponse(final List<Integer> finalPosition, final int cleanedPatches) {
         return new RoboticHooverResponse(finalPosition, 1);
+    }
+
+    @NotNull
+    private MvcResult getMvcResult(String validRequest, ResultMatcher status) throws Exception {
+        final RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/hoover")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(validRequest);
+
+        return mockMvc.perform(requestBuilder).andDo(print())
+                .andExpect(status)
+                .andReturn();
     }
 }

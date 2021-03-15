@@ -1,6 +1,5 @@
 package com.yoti.roboticHoover.controller;
 
-import com.yoti.roboticHoover.model.ExceptionResponse;
 import com.yoti.roboticHoover.model.Instructions;
 import com.yoti.roboticHoover.model.InstructionsWrapper;
 import com.yoti.roboticHoover.service.RoboticHooverService;
@@ -12,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 
 @RestController
 public class RoboticHooverController {
@@ -29,9 +26,6 @@ public class RoboticHooverController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(roboticHooverService.moveRoboticHoover(instructionsWrapper));
         } else {
-            final ExceptionResponse error = new ExceptionResponse(new Date(), HttpStatus.BAD_REQUEST.toString(),
-                    "Input error", instructionsWrapper.getBuildErrors());
-
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(instructionsWrapper.getBuildErrors());
