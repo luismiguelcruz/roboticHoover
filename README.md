@@ -47,7 +47,7 @@ make a treatment if it is needed later.
  Instructions parse.
 
 ## Improvements
-- It could be interesting adding a properties file that contains the possible errors, and use it instead of the raw
- string values.
 - Returning an error instead of (-1, -1) initial position when the initial coordinate has the correct size but it is
- out of the grid could be interesting, to keep the consistency of the errors.  
+ out of the grid could be interesting, to keep the consistency of the errors.
+- It is interesting adding a properties file that contains the possible errors, and use it instead of the raw
+  string values.  
