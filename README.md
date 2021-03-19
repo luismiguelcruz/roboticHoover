@@ -2,6 +2,7 @@
 # Yoti test
 + [Overview](#overview)
 + [Statement](#Statement)
++ [Problem in RoboticHooverServiceImpl](#Problem in RoboticHooverServiceImpl)
 + [Assumptions](#assumptions)
 + [Improvements](#improvements)
     
@@ -21,6 +22,11 @@ The room will be rectangular, has no obstacles (except the room walls), no doors
 Placing the hoover on a patch of dirt ("hoovering") removes the patch of dirt so that patch is then clean for the remainder of the program run. The hoover is always on - there is no need to enable it.
 
 Driving into a wall has no effect (the robot skids in place).
+
+### Problem with @Service
+I could notice that I defined an empty constructor in RoboticHooverServiceImpl. Spring uses dependency injection, 
+what means that we should have one instance of the service. That instance is injected everywhere where it is needed.
+When I defined and empty constructor I broke this rule and it was allowed to have multiple instances of the service.
 
 ## Assumptions
 I have assumed the following assumptions for creating the code:

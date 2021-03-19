@@ -17,9 +17,6 @@ public class RoboticHooverServiceImpl implements RoboticHooverService {
     private int cleanPatches;
     private List<Position> patches;
 
-    RoboticHooverServiceImpl() {
-    }
-
     @Override
     public RoboticHooverResponse moveRoboticHoover(final InstructionsWrapper instructions) {
         this.instructions = instructions;
